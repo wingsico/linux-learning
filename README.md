@@ -1,2 +1,2 @@
-# Shell-learning
-Linux Shell 学习记录
+# Linux-learning
+Linux 学习记录
