@@ -26,9 +26,21 @@ arg3="$3"
 s_line="${arg2:-1}"
 e_line="${arg3:-$max_line}"
 
-if [ "$s_line" -gt "$e_line" ]
+# 判断是否为整数数字
+expr $s_line + 0 &> /dev/null
+s_line_flag=$?
+expr $e_line + 0 &>/dev/null
+e_line_flag=$?
+
+if [ ! "$s_line_flag" -eq 0 ] || [ ! "$e_line_flag" -eq 0 ]
 then
-  echo "[arguments error]: Starting line number > ending line number."
+  error "[arguments error]: The third or fourth arguments are not number."
+  exit 1
+fi
+
+if [ "$s_line" -gt "$e_line" ] || [ "$s_line" -gt "$max_line" ] || [ "$e_line" -lt "$min_line" ]
+then
+  error "[arguments error]: The third or fourth arguments are not legal integers."
   exit 1
 elif [ "$s_line" -lt "$min_line" ]
 then
