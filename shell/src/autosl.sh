@@ -1,7 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
 src_path="/home/cc/github.com/vydVolk/linux-learning/shell/src"
 bin_path="/home/cc/github.com/vydVolk/linux-learning/shell/bin"
+
+lib_path="$(dirname $(readlink -f $0))/lib"
+
+. "$lib_path/stdout.sh"
 
 for sh in $(ls $src_path/*.sh)
 do
@@ -12,7 +16,7 @@ do
     rm -rf "$bin_path/$file_name"
   fi
 
-  ln -s "$sh" "$bin_path/$file_name" && echo "\033[32m\033[1m[$(date "+%H:%M:%S")] $file_name - completed!\033[0m"
+  ln -s "$sh" "$bin_path/$file_name" && success "$file_name - completed!"
 done
 
 exit 0

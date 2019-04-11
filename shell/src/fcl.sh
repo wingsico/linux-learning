@@ -1,18 +1,21 @@
-#!/bin/sh
+#!/bin/bash
+
+lib_path="$(dirname $(readlink -f $0))/lib"
+. "$lib_path/stdout.sh"
+
 
 file_name="$1"
 if [ -z "$file_name" ]
 then
-  echo "[arguments error]: Missing required parameters: file path."
+  error "[arguments error]: Missing required parameters: file path."
   exit 1
 fi
 
-file_path="$(cd "$(dirname "$0")"; pwd)/$file_name"
+file_path="$(pwd)/$file_name"
 
-
-if [ ! -r "$file_path" ]
+if [ ! -e "$file_path" ]
 then
-  echo "[arguments error]: File $file_name not found."
+  error "[arguments error]: File $file_name not found."
   exit 1
 fi
 
