@@ -15,6 +15,7 @@ then
 fi
 
 args=("$@")
+echo $args
 files=${args[@]:1}
 
 del_file_word() {
