@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 lib_path="$(dirname $(readlink -f $0))/lib"
 . "$lib_path/stdout.sh"
@@ -27,16 +28,15 @@ s_line="${arg2:-1}"
 e_line="${arg3:-$max_line}"
 
 # 判断是否为整数数字
-expr $s_line + 0 &> /dev/null
-s_line_flag=$?
-expr $e_line + 0 &>/dev/null
-e_line_flag=$?
+# expr $s_line + 0 &> /dev/null
+# s_line_flag=$?
+# expr $e_line + 0 &>/dev/null
+# e_line_flag=$?
 
-if [ ! "$s_line_flag" -eq 0 ] || [ ! "$e_line_flag" -eq 0 ]
-then
+expr $s_line + 0 &> /dev/null || expr $e_line + 0 &> /dev/null || {
   error "[arguments error]: The third or fourth arguments are not number."
   exit 1
-fi
+}
 
 if [ "$s_line" -gt "$e_line" ] || [ "$s_line" -gt "$max_line" ] || [ "$e_line" -lt "$min_line" ]
 then
@@ -51,6 +51,3 @@ then
 fi
 
 sed -n "$s_line,$e_line p" $file_path
-
-exit 0
-

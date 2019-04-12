@@ -1,3 +1,5 @@
+#! /bin/bash
+set -e
 
 sep=""
 
@@ -10,5 +12,3 @@ do
   fi
 done
 printf "\n"
-
-exit 0

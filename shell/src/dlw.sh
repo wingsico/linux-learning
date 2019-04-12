@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 min_arg_num=2
 arg_num="$#"
@@ -34,5 +35,3 @@ for file in $files
 do
   del_file_word "$file"
 done
-
-exit 0

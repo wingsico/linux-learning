@@ -1,9 +1,8 @@
 #! /bin/bash
-
+set -e
 
 lib_path="$(dirname $(readlink -f $0))/lib"
 . "$lib_path/stdout.sh"
-
 
 dir="$1"
 dir="${dir:-./}"

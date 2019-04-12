@@ -1,11 +1,11 @@
 #! /bin/bash
+set -e
 
 arg_num="$#"
 min_arg_num=1
 
 lib_path="$(dirname $(readlink -f $0))/lib"
 . "$lib_path/stdout.sh"
-
 
 if [ $arg_num -lt $min_arg_num ]
 then
@@ -31,8 +31,3 @@ do
     echo "File - $file_path"
   fi
 done
-
-exit 0
-
-
-

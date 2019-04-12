@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 arg_num="$#"
 min_arg_num=2
@@ -20,7 +21,7 @@ then
 fi
 
 words=("$(cat $words_file_path)")
-words=($(echo ${words[@]:0} | sed 's/ /\n/g' | sort | uniq))
+words=($(echo ${words[@]:0} | sed 's/ /\n/g' | grep -o '^\w\w*$' | uniq ))
 words=${words[@]:0}
 files=("$@")
 files=(${files[@]:1})
@@ -43,12 +44,7 @@ do
   for ((i=0;i<${#files[*]};i++))
   do
     file_path="$(pwd)/${files[$i]}"
-    printf "\t%s: %s" "[$(($i+1))]" "$(grep -w -o "$word" $file_path | wc -l)"
+    printf "\t%s: %s" "[$(($i+1))]" "$(grep -o -w "$word" $file_path | wc -l)"
   done
   printf "\n"
 done
-
-exit 0
-
-
-

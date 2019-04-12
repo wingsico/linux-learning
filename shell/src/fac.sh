@@ -1,4 +1,5 @@
 #! /bin/bash
+set -e
 
 lib_path="$(dirname $(readlink -f $0))/lib"
 . "$lib_path/stdout.sh"
@@ -16,13 +17,10 @@ then
   exit 1
 fi
 
-r=1
-for ((i=2; i <= n;i++)) ; do
-  r=$(echo $r*$i | bc)
-  r=$(echo $r | tr -d ["\\\n "])
+rst=1
+for ((i=2;i<=rst;i++)) ; do
+  rst=$(echo $rst*$i | bc)
+  rst=$(echo $rst | tr -d ["\\\n "])
 done
 
-echo "$n!=$r"
-
-
-
+echo "$n!=$rst"
