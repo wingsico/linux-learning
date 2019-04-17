@@ -15,5 +15,4 @@ elif [ ! -d $dir ]
 then
   error "\"$dir\": Not a directory"
 fi
-
 ls $dir -R -A | grep '^\.[^:]*' -o

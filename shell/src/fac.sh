@@ -18,7 +18,8 @@ then
 fi
 
 rst=1
-for ((i=2;i<=rst;i++)) ; do
+for ((i=2;i<=n;i++))
+do
   rst=$(echo $rst*$i | bc)
   rst=$(echo $rst | tr -d ["\\\n "])
 done

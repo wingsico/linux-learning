@@ -5,10 +5,9 @@ sep=""
 
 for file in $(ls -A)
 do
-  if [ -r $file ] && [ -w $file ] && [ -x $file ]
-  then
+  [[ -r $file &&  -w $file  &&  -x $file ]] && {
     printf "$sep%s" $file
     sep="   "
-  fi
+  }
 done
 printf "\n"
