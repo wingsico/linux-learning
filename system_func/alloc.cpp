@@ -22,5 +22,6 @@ int main() {
   }
 
   std::cout << "max: " << max << ", min: " << min << std::endl;
+  free(mp);
   return 0;
 }
