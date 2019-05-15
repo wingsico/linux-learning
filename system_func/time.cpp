@@ -8,8 +8,10 @@ int main() {
   time_t t;
   time(&t);
   // 格林尼治
+ std::cout << "[格林尼治] "; 
   showGMT(t, 0);
   // 北京
+  std::cout << "[Beijing] ";
   showGMT(t, 8);
   return 0;
 }

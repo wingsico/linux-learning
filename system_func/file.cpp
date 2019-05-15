@@ -29,8 +29,8 @@ int main() {
   unsigned long diff;
 
   gettimeofday(&start,NULL);
-  //qSort(strs, 0, strs.size()- 1);
-  bubbleSort(strs);
+  qSort(strs, 0, strs.size()- 1);
+  //bubbleSort(strs);
   gettimeofday(&end,NULL);
 
   diff = 1000000 * (end.tv_sec-start.tv_sec)+ end.tv_usec-start.tv_usec;
