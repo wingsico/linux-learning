@@ -1,4 +1,5 @@
 #include <sys/types.h>
+#include <sys/ioctl.h>
 #include <dirent.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -8,6 +9,9 @@
 #include <grp.h>
 #include <pwd.h>
 #include <time.h>
+#include <term.h>
+#include <curses.h>
+#include <math.h>
 
 #define max_dirs_num 10
 #define max_dirs_name_length 256
@@ -29,6 +33,7 @@ int l, R, a;
 char r_flag;
 char l_flag;
 
+int getLongestFilenameLength(DIR*);
 int getLongestGrpBit(DIR*);
 int getLongestUsrBit(DIR*);
 int getMaxSizeBit(DIR*);
@@ -46,13 +51,16 @@ char* join(char*,char*);
 void appendChildDir(ChildDir *dirs, char *name);
 int getUsername(uid_t, char[]);
 int getGrpname(gid_t, char[]);
+int getTerminalWidth();
+int getFileCount(DIR*); 
 
 int main(int argc, char* argv[]) {
   handleArgv(argc, argv);
   for(int i = 0; i < dirc; i++) {
     ls(dirs[i], "");
   }
-  if (a && !l) {
+  
+  if(!l) {
     printf("\n");
   }
 }
@@ -74,7 +82,7 @@ void ls(char* path, char* parent) {
   if (!l) {
     printf("%c", l_flag);
     l_flag = '\n';
-  }
+  } 
   if (R) {
     printf("%c", r_flag);
     r_flag = '\n';
@@ -89,7 +97,7 @@ void ls(char* path, char* parent) {
   const int time_strl = 14;
   char time_str[time_strl];
   if ((dir = opendir(path)) == NULL) {
-    printf("myls: cannot access '%s': No such file or directory", path);
+    printf("myls: cannot access '%s': No such file or directory or permission denied. \n", path);
     exit(0);
   }
 
@@ -98,10 +106,15 @@ void ls(char* path, char* parent) {
   int maxSizeBit = 0;
   int longestGrpBit = 0;
   int longestUsrBit = 0;
-
+  int longestFilenameLength = getLongestFilenameLength(dir);
+  int cols = (int)ceil(getTerminalWidth() / (double)(longestFilenameLength+2));
   const int strl = 50;
   char printstr[strl];
   char fileType = '-';
+  char nlprintstr[10];
+  int fileCount = getFileCount(dir);
+  snprintf(nlprintstr, 9, "%%-%ds  ", longestFilenameLength);
+  
   if (l) {
     maxSizeBit = getMaxSizeBit(dir);
     longestGrpBit = getLongestGrpBit(dir);
@@ -110,11 +123,13 @@ void ls(char* path, char* parent) {
     snprintf(printstr, strl - 1, "%%c%%s %%%dld %%-%ds %%-%ds %%%dld %%s %%s\n", maxLinkBit, longestUsrBit, longestGrpBit, maxSizeBit);
     printf("total %d\n", getDirBlocks(dir));
   }
-
+  
+  int filec = 0;
   while((ptr = readdir(dir)) != NULL) {
     if (!a && (ptr->d_name[0] == '.')) {
       continue;
     }
+    filec++;
     lstat(ptr->d_name, &buf);
     fileType = getFileType(buf.st_mode); 
     if (l) {
@@ -125,7 +140,14 @@ void ls(char* path, char* parent) {
       // "%c%s %ld %-s\t%-s %ld\next"
       printf(printstr, fileType, perm, buf.st_nlink, username, grpname, buf.st_size, time_str, ptr->d_name);
     } else {
-      printf("%s  ", ptr->d_name);
+      if (fileCount * longestFilenameLength < getTerminalWidth()) {
+        printf("%s  ", ptr->d_name);
+      } else {    
+      printf(nlprintstr, ptr->d_name);
+      }
+      if (filec % (cols-1) == 0 && filec != fileCount) {
+        printf("\n");
+      } 
     }
     if (R) {
       if (fileType == 'd' && strcmp(ptr->d_name, "..") && strcmp(ptr->d_name, ".")) {
@@ -174,7 +196,12 @@ char* join(char *s1, char *s2) {
 
   return result;
 }
+int getTerminalWidth() {
 
+struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    return w.ws_col;
+}
 int isAbsPath(char *path) {
   if (path[0] == '/' || path[0] == '~') {
     return 1;
@@ -210,7 +237,36 @@ int getTimeStr(time_t mtime, char str[]) {
   strcpy(str, temp);
   return 1;
 }
+int getLongestFilenameLength(DIR* d) {
+ struct dirent *de;
+  struct stat buf;
+  long int max = 0;
 
+  while((de = readdir(d)) != NULL) {
+    if (strlen(de->d_name) > max) {
+      max = strlen(de->d_name);
+    }
+  }
+  rewinddir(d);
+
+  return max;
+}
+
+int getFileCount(DIR* d) {
+  struct dirent *de;
+  struct stat buf;
+  long int count = 0;
+
+  while((de = readdir(d)) != NULL) {
+    if (!a && (de->d_name[0] == '.')) {
+    continue;
+    }
+    count++;
+  }
+   rewinddir(d);
+
+  return count;
+}
 int getMaxLinkBit(DIR* d) {
   struct dirent *de;
   struct stat buf;
