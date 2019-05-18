@@ -83,7 +83,7 @@ void ls(char* path, char* parent) {
     printf("%c", l_flag);
     l_flag = '\n';
   } 
-  if (R) {
+  if (R || dirc > 1) {
     printf("%c", r_flag);
     r_flag = '\n';
     strcpy(real_path,join(parent, path));
