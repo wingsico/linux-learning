@@ -10,30 +10,30 @@
 #define TYPE_S 1
 #define TYPE_C 2
 struct msgbuf {
-    long mtype;       /* message type, must be > 0 */
-    char mtext[1024];    /* message data */
+  long mtype;       /* message type, must be > 0 */
+  char mtext[1024];    /* message data */
 };
 
 int main()
 {
-    int msgid=-1;
-      //ftok
-      //    //key_t ftok(const char *pathname, int proj_id);
-      //        //ftok通过文件的inode节点号和一个proj_id计算出一个key值
-      //            //缺点：如果文件被删除，或者替换，那么将打开的不是同一个消息队列
-      //
-      //1.创建消息队列            
-    msgid=msgget(IPC_KEY,IPC_CREAT | 0664);
-    if(msgid<0){
-        perror("msgget error");
-        return -1;
-    }
-    while(1){
+  int msgid=-1;
+  //ftok
+  //    //key_t ftok(const char *pathname, int proj_id);
+  //        //ftok通过文件的inode节点号和一个proj_id计算出一个key值
+  //            //缺点：如果文件被删除，或者替换，那么将打开的不是同一个消息队列
+  //
+  //1.创建消息队列            
+  msgid=msgget(IPC_KEY,IPC_CREAT | 0664);
+  if(msgid<0){
+    perror("msgget error");
+    return -1;
+  }
+  while(1){
     struct msgbuf buf;
     //发送数据
     memset(&buf,0x00,sizeof(struct msgbuf));
     buf.mtype=TYPE_C;
-    scanf("%s",buf.mtext);
+    fgets(buf.mtext, 1024, stdin);
     msgsnd(msgid,&buf,1024,0);
     //2.接收数据
     //struct msgbuf这个结构体需要我们自己定义
@@ -46,8 +46,8 @@ int main()
     //msgflag 0默认
     //    MSG_NOERROR 当数据长度超过指定长度，则截断数据
     msgrcv(msgid,&buf,1024,TYPE_S,0);
-    printf("server say[%s]\n",buf.mtext);
-    }
-    msgctl(msgid,IPC_RMID,NULL);
-    return 0;
+    printf("server say: %s",buf.mtext);
+  }
+  msgctl(msgid,IPC_RMID,NULL);
+  return 0;
 }
